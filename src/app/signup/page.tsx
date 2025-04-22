@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function SignupPage() {
   const [user, setUser] = useState({
@@ -11,7 +12,31 @@ export default function SignupPage() {
     password: "",
     username: "",
   });
-  const onSignUp = async () => {};
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user.email && user.password && user.username && user.name) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
+
+  const onSignUp = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/users/signup", user);
+      console.log("signup response", response.data.message);
+      router.push("/login");
+    } catch (error: any) {
+      console.warn("Signup error:", error.response.data.error);
+      toast.error(error.response.data.error);
+    }finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="max-w-md mx-auto mt-30 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-4">
       <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
@@ -63,7 +88,7 @@ export default function SignupPage() {
           id="email"
           type="email"
           value={user?.email}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          onChange={(e) => setUser({ ...user, email: e.target.value.toLocaleLowerCase().trim() })}
           placeholder="Enter your email"
           className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -88,17 +113,21 @@ export default function SignupPage() {
 
       <button
         onClick={onSignUp}
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200 cursop"
+        disabled={buttonDisabled||loading}
+        type="submit"
+        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200 
+        cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Sign Up
+        {loading ? "Signing up..." : "Sign Up"}
       </button>
-        <Link
-          href="/login"
-          className="text-sm text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-300 transition duration-200"
-        >
-          Already have an account?{" "}
-          <span className="font-medium">Login instead.</span>
-        </Link>
+      <Link
+        href="/login"
+        className="text-sm text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 
+        dark:hover:text-blue-300 transition duration-200"
+      >
+        Already have an account?{" "}
+        <span className="font-medium">Login instead.</span>
+      </Link>
     </div>
   );
 }
