@@ -33,12 +33,18 @@ export default function SignupPage() {
     } catch (error: any) {
       console.warn("Signup error:", error.response.data.error);
       toast.error(error.response.data.error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
   return (
-    <div className="max-w-md mx-auto mt-30 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSignUp();
+      }}
+      className="max-w-md mx-auto mt-30 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-4"
+    >
       <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
         Sign Up
       </h1>
@@ -53,6 +59,7 @@ export default function SignupPage() {
         <input
           id="username"
           type="text"
+          required
           value={user?.username}
           onChange={(e) => setUser({ ...user, username: e.target.value })}
           placeholder="Create your username"
@@ -70,6 +77,7 @@ export default function SignupPage() {
         <input
           id="name"
           type="text"
+          required
           value={user?.name}
           onChange={(e) => setUser({ ...user, name: e.target.value })}
           placeholder="Enter your full name"
@@ -87,8 +95,14 @@ export default function SignupPage() {
         <input
           id="email"
           type="email"
+          required
           value={user?.email}
-          onChange={(e) => setUser({ ...user, email: e.target.value.toLocaleLowerCase().trim() })}
+          onChange={(e) =>
+            setUser({
+              ...user,
+              email: e.target.value.toLocaleLowerCase().trim(),
+            })
+          }
           placeholder="Enter your email"
           className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -104,6 +118,7 @@ export default function SignupPage() {
         <input
           id="password"
           type="password"
+          required
           value={user?.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
           placeholder="Enter a secure password"
@@ -112,22 +127,22 @@ export default function SignupPage() {
       </div>
 
       <button
-        onClick={onSignUp}
-        disabled={buttonDisabled||loading}
         type="submit"
+        disabled={buttonDisabled || loading}
         className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200 
-        cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Signing up..." : "Sign Up"}
       </button>
+
       <Link
         href="/login"
         className="text-sm text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 
-        dark:hover:text-blue-300 transition duration-200"
+      dark:hover:text-blue-300 transition duration-200"
       >
         Already have an account?{" "}
         <span className="font-medium">Login instead.</span>
       </Link>
-    </div>
+    </form>
   );
 }
