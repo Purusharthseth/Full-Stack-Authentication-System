@@ -147,5 +147,4 @@ export default function SignupPage() {
   );
 }
 
-
 //https://nextjs.org/docs/app/guides/authentication have this implemented in your site later on.

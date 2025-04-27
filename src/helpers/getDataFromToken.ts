@@ -8,6 +8,6 @@ export const getDataFromToken = (req: NextRequest) => {
         const data:any = jwt.verify(token, process.env.TOKEN_SECRET as string);
         return data.id;
     } catch (error: any) {
-        throw new Error(error.message);
+        console.error("Error in getDataFromToken:", error.message);
     }
 }; 

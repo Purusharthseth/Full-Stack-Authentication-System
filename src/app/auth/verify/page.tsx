@@ -1,11 +1,13 @@
 "use client";
 import axios from "axios";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function VerifyEmail() {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const router = useRouter();
 
     useEffect(() => {
         setLoading(true);
@@ -25,6 +27,11 @@ export default function VerifyEmail() {
             await axios.post("/api/users/verifyEmail", { token });
             setSuccess(true);
             setLoading(false);
+
+            setTimeout(() => {
+                router.push("/profile");
+            }, 2000);
+            
         } catch (error: any) {
             setSuccess(false);
             setLoading(false);
