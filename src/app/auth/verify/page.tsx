@@ -49,7 +49,7 @@ export default function VerifyEmail() {
         ) : (
           <div className="flex flex-col items-center gap-4">
             {success ? (
-              <p className="text-green-500 text-lg font-semibold">Email verified successfully!</p>
+              <p className="text-green-500 text-lg font-semibold">Email verified successfully✅! You will be redirected to your profile soon.</p>
             ) : (
               <p className="text-red-500 text-lg font-semibold">Failed to verify email.</p>
             )}

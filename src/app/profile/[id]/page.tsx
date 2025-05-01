@@ -9,7 +9,7 @@ export default function userProfile({ params }: any) {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [verieied, setVerified] = useState(false);
-    const [isVerifying, setIsVerifying] = useState(false);
+    const [sendingEmail, setSendingEmail] = useState(false);
     const p = use(params);
     const id = p.id;
 
@@ -33,21 +33,36 @@ export default function userProfile({ params }: any) {
     }, [user]);
 
     const verifyUser = async () => {
-        setIsVerifying(true); // Disable button immediately on click
+        setSendingEmail(true); // Disable button immediately on click
         try {
             await axios.post("/api/users/sendVerificationEmail", {
                 email: user.email,
                 userId: user._id,
             });
             setTimeout(() => {
-                setIsVerifying(false);
+                setSendingEmail(false);
             }, 60000);
         } catch (error: any) {
             toast.error("Error verifying user. Please try again.");
             console.error(error.response?.data?.message || error.message);
-            setIsVerifying(false);
+            setSendingEmail(false);
         }
     };
+    const forgetPassword = async () => {
+        setSendingEmail(true);
+        try {
+            await axios.post("/api/users/forgotPasswordEmail", {
+                email: user.email,
+                userId: user._id,
+            });
+            setTimeout(() => {
+                setSendingEmail(false);
+            }, 60000);
+        } catch (error: any) {
+            toast.error("Error sending password reset link. Please try again.");
+            console.error(error.response?.data?.message || error.message);
+        }
+    }
 
     return (
         <div className="max-w-md mx-auto mt-32 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-6">
@@ -56,24 +71,27 @@ export default function userProfile({ params }: any) {
             </h1>
             <p className="text-sm text-center text-gray-700 dark:text-gray-300">
                 This is the profile page of:{" "}
-                {user&&(<span className="text-red-400 text-md">{user.username}</span>)}
+                {user && (<span className="text-red-400 text-md">{user.username}</span>)}
             </p>
 
             {!verieied && (
                 <button
                     onClick={verifyUser}
-                    disabled={isVerifying}
-                    className={`px-4 py-2 w-full cursor-pointer bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${isVerifying ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                    disabled={sendingEmail}
+                    className={`px-4 py-2 w-full cursor-pointer bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+                        ${sendingEmail ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    {isVerifying ? 'Resend available in 60s' : 'Verify User'}
+                    {sendingEmail ? 'Resend available in 60s' : 'Verify User'}
                 </button>
             )}
 
             {/* Forget Password Section */}
             <div className="flex flex-col gap-4 items-center">
-                <button className="px-4 py-2 w-full cursor-pointer bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50">
-                    Forget Password
+                <button onClick={forgetPassword}
+                    disabled={sendingEmail}
+                    className={`px-4 py-2 w-full cursor-pointer bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 
+                    ${sendingEmail ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {sendingEmail ? 'Resend available in 60s' : "Forget Password"}
                 </button>
             </div>
 
