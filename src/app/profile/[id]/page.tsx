@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -11,20 +11,13 @@ interface User {
   username: string;
   isVerified: boolean;
 }
-
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
-export default function UserProfile({ params }: Props) {
+export default function UserProfile() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [verified, setVerified] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
 
-  const id = params.id;
+  const id = useParams<{id: string}>().id;
 
   useEffect(() => {
     const fetchUser = async () => {
