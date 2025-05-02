@@ -1,9 +1,8 @@
 "use client";
 import axios from "axios";
-import { set } from "mongoose";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function ProfilePage() {
@@ -13,18 +12,20 @@ export default function ProfilePage() {
       await axios.get("/api/users/logout");
       toast.success("Logged out successfully");
       router.push("/login");
-    } catch (error: any) {
-      console.log("Logout error:", error.response.data.error);
-      toast.error(error.response.data.error);
+    } catch (error) {
+      const err = error as any;
+      console.log("Logout error:", err.response.data.error);
+      toast.error(err.response.data.error);
     }
   };
-  const [userId, setUserId] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     const fetchUserId = async () => {
       try {
         const { data } = await axios.get("/api/users/getUserID");
         setUserId(data.userId);
       } catch (error: any) {
+        const err = error as any;
         console.log("Error fetching user ID:", error.response.data.error);
         toast.error(error.response.data.error);
       }

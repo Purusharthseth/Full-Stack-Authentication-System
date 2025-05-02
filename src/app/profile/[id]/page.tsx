@@ -2,105 +2,121 @@
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function userProfile({ params }: any) {
-    const router = useRouter();
-    const [user, setUser] = useState<any>(null);
-    const [verieied, setVerified] = useState(false);
-    const [sendingEmail, setSendingEmail] = useState(false);
-    const p = use(params);
-    const id = p.id;
+interface User {
+  _id: string;
+  email: string;
+  username: string;
+  isVerified: boolean;
+}
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res: any = await axios.get("/api/users/profile");
-                setUser(res.data.user);
-            } catch (error) {
-                console.error("Error fetching user:", error);
-            }
-        };
-        fetchUser();
-    }, []);
+interface Props {
+  params: {
+    id: string;
+  };
+}
 
-    useEffect(() => {
-        if (user) {
-            if (user._id != id) router.push("/profile");
-            setVerified(user.isVerified);
-        }
-    }, [user]);
+export default function UserProfile({ params }: Props) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [verified, setVerified] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
-    const verifyUser = async () => {
-        setSendingEmail(true); // Disable button immediately on click
-        try {
-            await axios.post("/api/users/sendVerificationEmail", {
-                email: user.email,
-                userId: user._id,
-            });
-            setTimeout(() => {
-                setSendingEmail(false);
-            }, 60000);
-        } catch (error: any) {
-            toast.error("Error verifying user. Please try again.");
-            console.error(error.response?.data?.message || error.message);
-            setSendingEmail(false);
-        }
+  const id = params.id;
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/users/profile");
+        setUser(res.data.user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
     };
-    const forgetPassword = async () => {
-        setSendingEmail(true);
-        try {
-            await axios.post("/api/users/forgotPasswordEmail", {
-                email: user.email,
-                userId: user._id,
-            });
-            setTimeout(() => {
-                setSendingEmail(false);
-            }, 60000);
-        } catch (error: any) {
-            toast.error("Error sending password reset link. Please try again.");
-            console.error(error.response?.data?.message || error.message);
-        }
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      if (user._id !== id) router.push("/profile");
+      setVerified(user.isVerified);
     }
+  }, [user, id, router]);
 
-    return (
-        <div className="max-w-md mx-auto mt-32 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-6">
-            <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
-                {verieied ? "Verified User ✅" : "Unverified User ❌"}
-            </h1>
-            <p className="text-sm text-center text-gray-700 dark:text-gray-300">
-                This is the profile page of:{" "}
-                {user && (<span className="text-red-400 text-md">{user.username}</span>)}
-            </p>
+  const verifyUser = async () => {
+    setSendingEmail(true);
+    try {
+      await axios.post("/api/users/sendVerificationEmail", {
+        email: user?.email,
+        userId: user?._id,
+      });
+      setTimeout(() => {
+        setSendingEmail(false);
+      }, 60000);
+    } catch (error) {
+        const err = error as any;
+      toast.error("Error verifying user. Please try again.");
+      console.error(err.response?.data?.message || err.message);
+      setSendingEmail(false);
+    }
+  };
 
-            {!verieied && (
-                <button
-                    onClick={verifyUser}
-                    disabled={sendingEmail}
-                    className={`px-4 py-2 w-full cursor-pointer bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
-                        ${sendingEmail ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                    {sendingEmail ? 'Resend available in 60s' : 'Verify User'}
-                </button>
-            )}
+  const forgetPassword = async () => {
+    setSendingEmail(true);
+    try {
+      await axios.post("/api/users/forgotPasswordEmail", {
+        email: user?.email,
+        userId: user?._id,
+      });
+      setTimeout(() => {
+        setSendingEmail(false);
+      }, 60000);
+    } catch (error: any) {
+      toast.error("Error sending password reset link. Please try again.");
+      console.error(error.response?.data?.message || error.message);
+      setSendingEmail(false);
+    }
+  };
 
-            {/* Forget Password Section */}
-            <div className="flex flex-col gap-4 items-center">
-                <button onClick={forgetPassword}
-                    disabled={sendingEmail}
-                    className={`px-4 py-2 w-full cursor-pointer bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 
-                    ${sendingEmail ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    {sendingEmail ? 'Resend available in 60s' : "Forget Password"}
-                </button>
-            </div>
+  return (
+    <div className="max-w-md mx-auto mt-32 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-6">
+      <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+        {verified ? "Verified User ✅" : "Unverified User ❌"}
+      </h1>
+      <p className="text-sm text-center text-gray-700 dark:text-gray-300">
+        This is the profile page of:{" "}
+        {user && <span className="text-red-400 text-md">{user.username}</span>}
+      </p>
 
-            {/* Go Back to Profile Section */}
-            <Link href="/profile" className="flex flex-col gap-4 items-center">
-                <button className="px-4 py-2 w-full cursor-pointer bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
-                    Go Back to Profile
-                </button>
-            </Link>
-        </div>
-    );
+      {!verified && (
+        <button
+          onClick={verifyUser}
+          disabled={sendingEmail}
+          className={`px-4 py-2 w-full cursor-pointer bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+            ${sendingEmail ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {sendingEmail ? "Resend available in 60s" : "Verify User"}
+        </button>
+      )}
+
+      <div className="flex flex-col gap-4 items-center">
+        <button
+          onClick={forgetPassword}
+          disabled={sendingEmail}
+          className={`px-4 py-2 w-full cursor-pointer bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 
+          ${sendingEmail ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {sendingEmail ? "Resend available in 60s" : "Forget Password"}
+        </button>
+      </div>
+
+      <Link href="/profile" className="flex flex-col gap-4 items-center">
+        <button className="px-4 py-2 w-full cursor-pointer bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+          Go Back to Profile
+        </button>
+      </Link>
+    </div>
+  );
 }
