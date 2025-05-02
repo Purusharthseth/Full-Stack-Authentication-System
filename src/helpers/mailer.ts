@@ -36,7 +36,7 @@ export const sendEmail = async ({ email, emailType, userId }: SendEmailParams) =
         const actionText = emailType === 'VERIFY' ? 'Verify Email' : 'Reset Password';
 
         const mailOptions = {
-            from: 'purusharth2@gmail.com',
+            from: `no-reply@full-stack-authentication-system.vercel.app`,
             to: email,
             subject,
             html: `<p>Please ${actionText.toLowerCase()} by clicking the link below:</p>
