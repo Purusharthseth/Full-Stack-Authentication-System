@@ -36,7 +36,7 @@ export default function LoginPage() {
       setButtonDisabled(true);
     }
   }, [user]);
-  
+
   return (
     <form
       onSubmit={(e) => {

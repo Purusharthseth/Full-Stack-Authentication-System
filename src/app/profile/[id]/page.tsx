@@ -1,6 +1,5 @@
 "use client";
 import axios from "axios";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -56,22 +55,6 @@ export default function UserProfile() {
     }
   };
 
-  const forgetPassword = async () => {
-    setSendingEmail(true);
-    try {
-      await axios.post("/api/users/forgotPasswordEmail", {
-        email: user?.email,
-        userId: user?._id,
-      });
-      setTimeout(() => {
-        setSendingEmail(false);
-      }, 60000);
-    } catch (error: any) {
-      toast.error("Error sending password reset link. Please try again.");
-      console.error(error.response?.data?.message || error.message);
-      setSendingEmail(false);
-    }
-  };
 
   return (
     <div className="max-w-md mx-auto mt-32 p-6 bg-white dark:bg-zinc-900 shadow-lg rounded-2xl flex flex-col gap-6">
@@ -95,21 +78,18 @@ export default function UserProfile() {
       )}
 
       <div className="flex flex-col gap-4 items-center">
-        <button
-          onClick={forgetPassword}
-          disabled={sendingEmail}
+        
+        <button onClick={() => router.push("/forgot-password")}
           className={`px-4 py-2 w-full cursor-pointer bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 
-          ${sendingEmail ? "opacity-50 cursor-not-allowed" : ""}`}
+          `}
         >
-          {sendingEmail ? "Resend available in 60s" : "Forget Password"}
+          Reset Password
         </button>
       </div>
-
-      <Link href="/profile" className="flex flex-col gap-4 items-center">
-        <button className="px-4 py-2 w-full cursor-pointer bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+        <button onClick={() => router.push("/profile")}
+        className="px-4 py-2 w-full cursor-pointer bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
           Go Back to Profile
         </button>
-      </Link>
     </div>
   );
 }

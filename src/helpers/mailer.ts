@@ -2,25 +2,26 @@ import nodemailer from 'nodemailer';
 import User from '@/models/userModel';
 import bcryptjs from 'bcryptjs';
 import { connect } from '@/dbconfig/dbconfig';
+import crypto from 'crypto';
 
 connect();
 
 interface SendEmailParams {
     email: string;
     emailType: 'VERIFY' | 'RESET';
-    userId: string;
 }
 
-export const sendEmail = async ({ email, emailType, userId }: SendEmailParams) => {
+export const sendEmail = async ({ email, emailType }: SendEmailParams) => {
     try {
-        const hashedToken = await bcryptjs.hash(userId, 10);
-
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = await bcryptjs.hash(rawToken, 10);
         const updateFields =
             emailType === 'VERIFY'
                 ? { verifyToken: hashedToken, verifyTokenExpiry: Date.now() + 3600000 }
                 : { forgotPasswordToken: hashedToken, forgotPasswordTokenExpiry: Date.now() + 3600000 };
 
-        await User.findByIdAndUpdate(userId, updateFields, { new: true });
+        const user = await User.findOneAndUpdate({email}, updateFields, { new: true });
+        if(!user) throw new Error('User not found');
 
         const transport = nodemailer.createTransport({
             host: 'sandbox.smtp.mailtrap.io',

@@ -15,9 +15,10 @@ export default function ForgotPasswordPage() {
             setTimeout(() => {
                 setLoading(false);
             }, 60000);
+            toast.success("Password reset link sent to your email.");
         } catch (error: any) {
-            toast.error("Error sending password reset link. Please try again.");
-            console.error(error.response?.data?.message || error.message);
+            toast.error("Error sending password reset link: " + error.response?.data?.error || error.message);
+            console.error(error.response?.data?.error || error.message);
             setLoading(false);
         }
     };
@@ -57,10 +58,10 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 <button
-                    type="submit"
-                    className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200 cursor-pointer"
+                    type="submit" disabled={loading}
+                    className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Send Reset Link
+                    {loading? "Wait before requesting again":"Send Reset Link"}
                 </button>
             </form>
         </div>
