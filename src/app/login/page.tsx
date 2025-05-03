@@ -36,6 +36,7 @@ export default function LoginPage() {
       setButtonDisabled(true);
     }
   }, [user]);
+  
   return (
     <form
       onSubmit={(e) => {
@@ -88,6 +89,12 @@ export default function LoginPage() {
           required
         />
       </div>
+      <Link
+        href="/forgot-password"
+        className="text-sm text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-300 transition duration-200 text-left"
+      >
+        Forgot Password?
+      </Link>
 
       <button
         type="submit"
