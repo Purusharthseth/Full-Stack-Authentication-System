@@ -14,7 +14,7 @@ export default function UserProfile() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [verified, setVerified] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(true);
 
   const id = useParams<{id: string}>().id;
 
@@ -34,6 +34,7 @@ export default function UserProfile() {
     if (user) {
       if (user._id !== id) router.push("/profile");
       setVerified(user.isVerified);
+      setSendingEmail(false);
     }
   }, [user, id, router]);
 

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
     try {
         const { email, userId } = await request.json();
-        await sendEmail({ email, emailType: 'VERIFY', userId });
+        await sendEmail({ email, emailType: 'VERIFY' });
         return NextResponse.json({ message: 'Verification email sent successfully' }, { status: 200 });
     } catch (error: any) {
         console.log(error.message);
