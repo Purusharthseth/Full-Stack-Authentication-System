@@ -41,7 +41,7 @@ export const sendEmail = async ({ email, emailType }: SendEmailParams) => {
             to: email,
             subject,
             html: `<p>Please ${actionText.toLowerCase()} by clicking the link below:</p>
-                <a href="${process.env.DOMAIN}/auth/${linkPath}?token=${hashedToken}">${actionText}</a>`,
+                <a href="${process.env.DOMAIN}/auth/${linkPath}?token=${rawToken}">${actionText}</a>`,
         };
 
         const mailResponse = await transport.sendMail(mailOptions);
